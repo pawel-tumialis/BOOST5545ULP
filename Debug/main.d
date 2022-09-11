@@ -1,7 +1,7 @@
 # FIXED
 
 main.obj: ../main.c
-main.obj: ../codec_3206.h
+main.obj: C:/INZYNIERKA/Przetwarzanie_sygnalow/BOOST5545ULP/codec_3206.h
 main.obj: C:/INZYNIERKA/Przetwarzanie_sygnalow/inc/platform_internals.h
 main.obj: C:/ti/ccs1110/ccs/tools/compiler/c5500_4.4.1/include/stdio.h
 main.obj: C:/ti/ccs1110/ccs/tools/compiler/c5500_4.4.1/include/linkage.h
@@ -78,13 +78,10 @@ main.obj: C:/INZYNIERKA/Przetwarzanie_sygnalow/inc/csl_wdt.h
 main.obj: C:/INZYNIERKA/Przetwarzanie_sygnalow/inc/platform.h
 main.obj: C:/INZYNIERKA/Przetwarzanie_sygnalow/inc/platform_test.h
 main.obj: C:/INZYNIERKA/Przetwarzanie_sygnalow/inc/evm5515.h
-main.obj: ../led.h
-main.obj: ../button.h
-main.obj: ../oled.h
 
 ../main.c:
 
-../codec_3206.h:
+C:/INZYNIERKA/Przetwarzanie_sygnalow/BOOST5545ULP/codec_3206.h:
 
 C:/INZYNIERKA/Przetwarzanie_sygnalow/inc/platform_internals.h:
 
@@ -237,10 +234,4 @@ C:/INZYNIERKA/Przetwarzanie_sygnalow/inc/platform.h:
 C:/INZYNIERKA/Przetwarzanie_sygnalow/inc/platform_test.h:
 
 C:/INZYNIERKA/Przetwarzanie_sygnalow/inc/evm5515.h:
-
-../led.h:
-
-../button.h:
-
-../oled.h:
 

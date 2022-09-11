@@ -46,9 +46,9 @@ TEST_STATUS initialize_led(GPIO_Handle gpioObject)
 		C55x_msgWrite("GPIO_configBit failed\n\r");
 	    return (TEST_FAIL);
 	}
+    status = GPIO_write(gpioObject, LED2, 0);
     status = GPIO_write(gpioObject, LED0, 0);
     status = GPIO_write(gpioObject, LED1, 0);
-    status = GPIO_write(gpioObject, LED2, 0);
     return (TEST_PASS);
 
 }

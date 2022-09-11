@@ -1,1 +1,0 @@
-Próbkowanie sygnału za pomocą kodeka, implementacja filtrów na 1024 próbek przesyłanych poprzez moduł DMA
