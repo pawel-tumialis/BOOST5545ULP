@@ -9,21 +9,45 @@ CMD_SRCS += \
 ../C5545BP.cmd 
 
 C_SRCS += \
-../main.c 
+../button.c \
+../codec_3206.c \
+../led.c \
+../main.c \
+../oled.c 
 
 C_DEPS += \
-./main.d 
+./button.d \
+./codec_3206.d \
+./led.d \
+./main.d \
+./oled.d 
 
 OBJS += \
-./main.obj 
+./button.obj \
+./codec_3206.obj \
+./led.obj \
+./main.obj \
+./oled.obj 
 
 OBJS__QUOTED += \
-"main.obj" 
+"button.obj" \
+"codec_3206.obj" \
+"led.obj" \
+"main.obj" \
+"oled.obj" 
 
 C_DEPS__QUOTED += \
-"main.d" 
+"button.d" \
+"codec_3206.d" \
+"led.d" \
+"main.d" \
+"oled.d" 
 
 C_SRCS__QUOTED += \
-"../main.c" 
+"../button.c" \
+"../codec_3206.c" \
+"../led.c" \
+"../main.c" \
+"../oled.c" 
 
 

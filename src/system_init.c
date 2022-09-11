@@ -98,9 +98,7 @@ ProgramPLL_100MHz()
 static Platform_STATUS initUserIf(void)
 {
 	Platform_STATUS status = Platform_EOK;
-    // Reset all peripherals
-    CSL_SYSCTRL_REGS->PSRCR = 0x0020;
-    CSL_SYSCTRL_REGS->PRCR = 0x00BF;
+
 	ProgramPLL_100MHz();
 
 #ifdef USE_SERIAL_CONSOLE

@@ -10,11 +10,11 @@ GEN_OPTS__FLAG :=
 GEN_CMDS__FLAG := 
 
 ORDERED_OBJS += \
+"./button.obj" \
+"./codec_3206.obj" \
+"./led.obj" \
 "./main.obj" \
-"./BOOST5545ULP/button.obj" \
-"./BOOST5545ULP/codec_3206.obj" \
-"./BOOST5545ULP/led.obj" \
-"./BOOST5545ULP/oled.obj" \
+"./oled.obj" \
 "./src/csl_audioClass.obj" \
 "./src/csl_cdc.obj" \
 "./src/csl_dat.obj" \
@@ -62,10 +62,8 @@ RMDIR := RMDIR /S/Q
 # All of the sources participating in the build are defined here
 -include sources.mk
 -include subdir_vars.mk
--include BOOST5545ULP/subdir_vars.mk
 -include src/subdir_vars.mk
 -include subdir_rules.mk
--include BOOST5545ULP/subdir_rules.mk
 -include src/subdir_rules.mk
 -include objects.mk
 
@@ -197,8 +195,8 @@ Przetwarzanie_sygnalow.hex: $(EXE_OUTPUTS)
 # Other Targets
 clean:
 	-$(RM) $(BIN_OUTPUTS__QUOTED)$(EXE_OUTPUTS__QUOTED)
-	-$(RM) "main.obj" "BOOST5545ULP\button.obj" "BOOST5545ULP\codec_3206.obj" "BOOST5545ULP\led.obj" "BOOST5545ULP\oled.obj" "src\csl_audioClass.obj" "src\csl_cdc.obj" "src\csl_dat.obj" "src\csl_dma.obj" "src\csl_emif.obj" "src\csl_gpio.obj" "src\csl_gpt.obj" "src\csl_i2c.obj" "src\csl_i2s.obj" "src\csl_intc.obj" "src\csl_irqplug.obj" "src\csl_lcdc.obj" "src\csl_mcbsp.obj" "src\csl_mcspi.obj" "src\csl_mem.obj" "src\csl_mmcsd.obj" "src\csl_mmcsd_ataIf.obj" "src\csl_msc.obj" "src\csl_pll.obj" "src\csl_rtc.obj" "src\csl_sar.obj" "src\csl_sdio.obj" "src\csl_spi.obj" "src\csl_sysctrl.obj" "src\csl_uart.obj" "src\csl_uhpi.obj" "src\csl_usb.obj" "src\csl_wdt.obj" "src\evm5515.obj" "src\evm5515_gpio.obj" "src\evm5515_i2c.obj" "src\i2c_probe.obj" "src\platform.obj" "src\system_init.obj" "src\vectors.obj" 
-	-$(RM) "main.d" "BOOST5545ULP\button.d" "BOOST5545ULP\codec_3206.d" "BOOST5545ULP\led.d" "BOOST5545ULP\oled.d" "src\csl_audioClass.d" "src\csl_cdc.d" "src\csl_dat.d" "src\csl_dma.d" "src\csl_emif.d" "src\csl_gpio.d" "src\csl_gpt.d" "src\csl_i2c.d" "src\csl_i2s.d" "src\csl_intc.d" "src\csl_lcdc.d" "src\csl_mcbsp.d" "src\csl_mcspi.d" "src\csl_mem.d" "src\csl_mmcsd.d" "src\csl_mmcsd_ataIf.d" "src\csl_msc.d" "src\csl_pll.d" "src\csl_rtc.d" "src\csl_sar.d" "src\csl_sdio.d" "src\csl_spi.d" "src\csl_sysctrl.d" "src\csl_uart.d" "src\csl_uhpi.d" "src\csl_usb.d" "src\csl_wdt.d" "src\evm5515.d" "src\evm5515_gpio.d" "src\evm5515_i2c.d" "src\i2c_probe.d" "src\platform.d" "src\system_init.d" 
+	-$(RM) "button.obj" "codec_3206.obj" "led.obj" "main.obj" "oled.obj" "src\csl_audioClass.obj" "src\csl_cdc.obj" "src\csl_dat.obj" "src\csl_dma.obj" "src\csl_emif.obj" "src\csl_gpio.obj" "src\csl_gpt.obj" "src\csl_i2c.obj" "src\csl_i2s.obj" "src\csl_intc.obj" "src\csl_irqplug.obj" "src\csl_lcdc.obj" "src\csl_mcbsp.obj" "src\csl_mcspi.obj" "src\csl_mem.obj" "src\csl_mmcsd.obj" "src\csl_mmcsd_ataIf.obj" "src\csl_msc.obj" "src\csl_pll.obj" "src\csl_rtc.obj" "src\csl_sar.obj" "src\csl_sdio.obj" "src\csl_spi.obj" "src\csl_sysctrl.obj" "src\csl_uart.obj" "src\csl_uhpi.obj" "src\csl_usb.obj" "src\csl_wdt.obj" "src\evm5515.obj" "src\evm5515_gpio.obj" "src\evm5515_i2c.obj" "src\i2c_probe.obj" "src\platform.obj" "src\system_init.obj" "src\vectors.obj" 
+	-$(RM) "button.d" "codec_3206.d" "led.d" "main.d" "oled.d" "src\csl_audioClass.d" "src\csl_cdc.d" "src\csl_dat.d" "src\csl_dma.d" "src\csl_emif.d" "src\csl_gpio.d" "src\csl_gpt.d" "src\csl_i2c.d" "src\csl_i2s.d" "src\csl_intc.d" "src\csl_lcdc.d" "src\csl_mcbsp.d" "src\csl_mcspi.d" "src\csl_mem.d" "src\csl_mmcsd.d" "src\csl_mmcsd_ataIf.d" "src\csl_msc.d" "src\csl_pll.d" "src\csl_rtc.d" "src\csl_sar.d" "src\csl_sdio.d" "src\csl_spi.d" "src\csl_sysctrl.d" "src\csl_uart.d" "src\csl_uhpi.d" "src\csl_usb.d" "src\csl_wdt.d" "src\evm5515.d" "src\evm5515_gpio.d" "src\evm5515_i2c.d" "src\i2c_probe.d" "src\platform.d" "src\system_init.d" 
 	-$(RM) "src\csl_irqplug.d" "src\vectors.d" 
 	-@echo 'Finished clean'
 	-@echo ' '
