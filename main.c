@@ -1,4 +1,5 @@
 #include "codec_3206.h"
+#include "button.h"
 
 #define SAMPLE_NUMBER 1024
 CSL_DMA_Handle      dmaHandleRxL;
@@ -10,8 +11,8 @@ CSL_DMA_Config      getdmaConfig;
 CSL_DMA_ChannelObj  dmaObj;
 CSL_Status          status;
 
-Uint16 i2sDmaReadBufLeft[SAMPLE_NUMBER];
-Uint16 i2sDmaReadBufRight[SAMPLE_NUMBER];
+Int16 i2sDmaReadBufLeft[SAMPLE_NUMBER];
+Int16 i2sDmaReadBufRight[SAMPLE_NUMBER];
 #pragma DATA_ALIGN(i2sDmaReadBufLeft, 4);
 #pragma DATA_ALIGN(i2sDmaReadBufRight, 4);
 
@@ -22,7 +23,7 @@ TEST_STATUS initialize_dma(void);
 int main(void)
 {
     // Initialize the platform
-    status = initPlatform();
+    status = initPlatform();    //delete for
     if(status != Platform_EOK)
     {
         printf("Systen_init Failed\n\r");
@@ -44,12 +45,13 @@ int main(void)
     }
 
     //Int16  data1, data2;  //for testing stereo
-    while(1){
-
-                //I2S_readLeft(&data1);
-                //I2S_readRight(&data2);
-                //I2S_writeLeft(data1);
-                //I2S_writeRight(data2);
+    while(1){/*
+                I2S_readLeft(&data1);
+                I2S_readRight(&data2);
+                data1 &= 0xFFEB;
+                data2 &= 0xFFEB;
+                I2S_writeLeft(data1);
+                I2S_writeRight(data2);*/
     }
 
     return (0);
@@ -132,14 +134,11 @@ TEST_STATUS initialize_dma(void){
     dmaHandleTxR = DMA_open((CSL_DMAChanNum)5,&dmaObj, &status);
     status = DMA_config(dmaHandleTxR, &dmaConfig);
 
-    //start channel with sync
+    //start RX channels with sync
     dmaHandleRxL->dmaRegs->DMACH2TCR2 |= 0x8004;
-    dmaHandleTxL->dmaRegs->DMACH0TCR2 |= 0x8004;
     dmaHandleRxR->dmaRegs->DMACH3TCR2 |= 0x8004;
-    dmaHandleTxR->dmaRegs->DMACH1TCR2 |= 0x8004;
     return (status);
 }
-
 
 interrupt void dma_isr(void)
 {
@@ -147,4 +146,46 @@ interrupt void dma_isr(void)
 
     ifrValue = CSL_SYSCTRL_REGS->DMAIFR;
     CSL_SYSCTRL_REGS->DMAIFR |= ifrValue;
+
+    // Check for DMA1 TXL transfer completion
+    if (ifrValue & (1<<4))
+    {
+        // Stop TXL
+        dmaHandleTxL->dmaRegs->DMACH0TCR2 &= 0x7FFF;
+        // Start RXL
+        dmaHandleRxL->dmaRegs->DMACH2TCR2 |= 0x8004;
+    }
+    // Check for DMA1 TXR transfer completion
+    if (ifrValue & (1<<5))
+    {
+        // Stop TXR
+        dmaHandleTxR->dmaRegs->DMACH1TCR2 &= 0x7FFF;
+        // Start RXR
+        dmaHandleRxR->dmaRegs->DMACH2TCR2 |= 0x8004;
+    }
+
+    // Check for DMA1 RXL transfer completion
+    if (ifrValue & (1<<6))
+    {
+        // Stop RXL
+        dmaHandleRxL->dmaRegs->DMACH3TCR2 &= 0x7FFF;
+        // ----------------------STUDENT ZONE-----------------------
+
+        // ---------------------------------------------------------
+
+        // Start TXL
+        dmaHandleTxL->dmaRegs->DMACH0TCR2 |= 0x8004;
+    }
+
+    // Check for DMA1 RXR transfer completion
+    if (ifrValue & (1<<7))
+    {
+        // Stop RXR
+        dmaHandleRxR->dmaRegs->DMACH3TCR2 &= 0x7FFF;
+        // ----------------------STUDENT ZONE-----------------------
+
+        // ---------------------------------------------------------
+        // Start TXR
+        dmaHandleTxR->dmaRegs->DMACH1TCR2 |= 0x8004;
+    }
 }
