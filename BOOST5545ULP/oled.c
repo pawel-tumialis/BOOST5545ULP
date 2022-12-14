@@ -2283,3 +2283,51 @@ TEST_STATUS initialize_oled()
     return (TEST_PASS);
 
 }
+#define OLED_LENGTH 96
+#define OLED_WIDTH 16
+
+void writeFFT(Int16* fft_buffor, Int16 size){
+    Int16 i=0;
+    Int16 j=0;
+    Int16 value=0;
+    Int16 send_value=0;
+
+    send(0x00,0x2e);  // Deactivate Scrolling
+
+    //draw down
+    resetCursor(1);
+    for (i=0;i<OLED_LENGTH;i++){
+        value = fft_buffor[i*(size/OLED_LENGTH)]/2048; // co 5 probka z tablicy na 16 pixelach
+        if(value > 8)
+            value = 8;
+        if(value!=0){
+            send_value = 2;
+            for(j=1;j<value;j++){
+                send_value = send_value *2;
+            }
+            send_value = send_value -1;
+        }else{
+            send_value = 0;
+        }
+        send(0x40,send_value);
+    }
+
+    //draw bottom
+    resetCursor(0);
+    for (i=0;i<OLED_LENGTH;i++){
+        value = fft_buffor[i*(size/OLED_LENGTH)]/2048; // co 5 probka z tablicy na 16 pixelach
+        if(value < 8)
+            value = 0;
+        value = value%8;
+        if(value!=0){
+            send_value = 2;
+            for(j=1;j<value;j++){
+                send_value = send_value *2;
+            }
+            send_value = send_value -1;
+        }else{
+            send_value = 0;
+        }
+        send(0x40,send_value);
+    }
+}
