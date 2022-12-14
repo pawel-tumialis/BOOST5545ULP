@@ -1,6 +1,8 @@
 #include "platform_internals.h"
 #include "platform_test.h"
 
+// SSD1306
+
 #define I2C_ADDR 0x3C
 
 typedef	Uint16 I2C_RET;
@@ -78,6 +80,8 @@ void noAutoscroll();
 I2C_RET setline(Int8 line);
 void setRolling(Int8 row, Int8 status);
 void resetCursor(Int8 page);
+
+void writeFFT(Int16* fft_buffor, Int16 size);
 
 /**
  * \brief Function to probe I2C devices
