@@ -287,4 +287,91 @@ TEST_STATUS initialize_codec(void){
 
 }
 
+TEST_STATUS initialize_codec_micro(void){
+    Int16 retVal;
+
+        /* Enable clocks to all peripherals */
+        CSL_SYSCTRL_REGS->PCGCR1 = 0x0000;
+        CSL_SYSCTRL_REGS->PCGCR2 = 0x0000;
+
+        retVal =  SYS_setEBSR(CSL_EBSR_FIELD_PPMODE,
+                              CSL_EBSR_PPMODE_1);    // Configure Parallel Port for I2S2
+        retVal |= SYS_setEBSR(CSL_EBSR_FIELD_SP1MODE,
+                                 CSL_EBSR_SP1MODE_1);  // Serial Port mode 1 (I2S1 and GP[11:10]).
+        retVal = initialise_i2c_interface(NULL);
+        if(retVal != 0)
+        {
+            C55x_msgWrite("I2C initialisation failed\n\r");
+            return (TEST_FAIL);
+        }
+
+    /* Configure AIC3206 with microphone */
+        AIC3206_write(  0, 0x00 );      // Select page 0
+        AIC3206_write(  1, 0x01 );      // Reset codec
+        C55x_delay_msec(1);         // Wait 1ms after reset
+        AIC3206_write(  0, 0x01 );      // Select page 1
+        AIC3206_write(  1, 0x08 );      // Disable crude AVDD generation from DVDD
+        AIC3206_write(  2, 0x00 );      // Enable Analog Blocks
+
+        //AIC3206_write( 123,0x05 );  // Force reference to power up in 40ms
+        //C55x_delay_msec(40);        // Wait at least 40ms
+        // PLL and Clocks config and Power Up
+        AIC3206_write(  0, 0x00 );      // Select page 0
+        AIC3206_write( 27, 0x00 );      // BCLK and WCLK is set as i/p to AIC3206(Slave)
+        AIC3206_write(  4, 0x07 );      // PLL setting: PLLCLK <- BCLK and CODEC_CLKIN <-PLL CLK
+        AIC3206_write(  6, 0x20 );      // PLL setting: J = 32
+        AIC3206_write(  7, 0 );         // PLL setting: HI_BYTE(D)
+        AIC3206_write(  8, 0 );         // PLL setting: LO_BYTE(D)
+        // For 48 KHz sampling
+        AIC3206_write(  5, 0x92 );      // PLL setting: Power up PLL, P=1 and R=2
+        AIC3206_write( 13, 0x00 );      // Hi_Byte(DOSR) for DOSR = 128 decimal or 0x0080 DAC oversamppling
+        AIC3206_write( 14, 0x80 );      // Lo_Byte(DOSR) for DOSR = 128 decimal or 0x0080
+        AIC3206_write( 20, 0x80 );      // AOSR for AOSR = 128 decimal or 0x0080 for decimation filters 1 to 6
+        AIC3206_write( 11, 0x84 );      // Power up NDAC and set NDAC value to 4
+        AIC3206_write( 12, 0x82 );      // Power up MDAC and set MDAC value to 2
+        AIC3206_write( 18, 0x84 );      // Power up NADC and set NADC value to 4
+        AIC3206_write( 19, 0x82 );      // Power up MADC and set MADC value to 2
+        // DAC ROUTING and Power Up
+        AIC3206_write(  0, 0x01 );      // Select page 1
+        AIC3206_write( 12, 0x08 );      // LDAC AFIR routed to HPL
+        AIC3206_write( 13, 0x08 );      // RDAC AFIR routed to HPR
+        AIC3206_write(  0, 0x00 );      // Select page 0
+        AIC3206_write( 64, 0x02 );      // Left vol=right vol
+        AIC3206_write( 65, 0x00 );      // Left DAC gain to 0dB VOL; Right tracks Left
+        AIC3206_write( 63, 0xd4 );      // Power up left,right data paths and set channel
+        AIC3206_write(  0, 0x01 );      // Select page 1
+        AIC3206_write( 16, 0x06 );      // Unmute HPL , 6dB gain
+        AIC3206_write( 17, 0x06 );      // Unmute HPR , 6dB gain
+        AIC3206_write(  9, 0x30 );      // Power up HPL,HPR
+        AIC3206_write(  0, 0x00 );      // Select page 0
+        C55x_delay_msec( 5);            // Wait 5 msec
+        // ADC ROUTING and Power Up
+        AIC3206_write(  0, 0x01 );      // Select page 1
+        AIC3206_write( 51, 0x40 );      // SetMICBIAS
+        AIC3206_write( 52, 0x30 );      // STEREO 1 Jack
+        // IN2_L to LADC_P through 40 kohm
+        AIC3206_write( 55, 0x03 );      // IN2_R to RADC_P through 40 kohmm
+        AIC3206_write( 54, 0x03 );      // CM_1 (common mode) to LADC_M through 40 kohm
+        AIC3206_write( 57, 0xc0 );      // CM_1 (common mode) to RADC_M through 40 kohm
+        AIC3206_write( 59, 0x5f );      // MIC_PGA_L unmute
+        AIC3206_write( 60, 0x5f );      // MIC_PGA_R unmute
+        AIC3206_write(  0, 0x00 );      // Select page 0
+        AIC3206_write( 81, 0xc0 );      // Powerup Left and Right ADC
+        AIC3206_write( 82, 0x00 );      // Unmute Left and Right ADC
+
+        AIC3206_write( 0,  0x00 );
+        C55x_delay_msec( 2 );           // Wait 2 msec
+
+    /* Initialize I2S */
+    //initialise_i2s_interface();
+        I2S2_SRGR = 0x0015;
+        I2S2_ICMR = 0x0028;    // Enable interrupts
+        I2S2_CR   = 0x8012;    // 16-bit word, Master, enable I2C
+    //I2S_close(hI2s);    // Disble I2S
+    //AIC3206_write( 1, 0x01 );  // Reset codec
+
+    return 0;
+
+}
+
 

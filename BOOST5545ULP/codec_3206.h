@@ -10,6 +10,7 @@
 extern CSL_I2sHandle   hI2s;
 
 TEST_STATUS initialize_codec(void);
+TEST_STATUS initialize_codec_micro(void);
 TEST_STATUS initialise_i2s_interface(void);
 void I2S_readLeft(Int16* data);
 void I2S_writeLeft(Int16 data);
