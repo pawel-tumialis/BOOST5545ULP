@@ -48,7 +48,7 @@ Uint16 out_sel;
 Int32_ *result;
 Int16 *result_16;
 Int32 pow[512];
-float pow_fl[512];
+Int16 pow_fl[512];
 
 Int16 real, imag;
 
@@ -167,7 +167,6 @@ interrupt void dma_isr(void)
     int ifrValue;
 
     ifrValue = CSL_SYSCTRL_REGS->DMAIFR;
-    CSL_SYSCTRL_REGS->DMAIFR |= ifrValue;
 
     // Check for DMA1 TXL transfer completion
     if (ifrValue & (1<<4))
@@ -179,8 +178,8 @@ interrupt void dma_isr(void)
                         tab_fft[jj] = (Uint32)samples_left[jj] << 16; // wczytanie probki do czesci realis
                     }
                     fft_flag = FFT_FLAG;
-                    // scale_flag = NOSCALE_FLAG;   // niebezpieczne!!!, ale konieczne dla sygnalow o malym poziomie!!!
-                    scale_flag = SCALE_FLAG;    // zawsze bezpieczne, ale dla sygnalow o malym poziomie amplitudy prazkow moga byc male i ginac w szumie szerokopasmowym
+                     scale_flag = NOSCALE_FLAG;   // niebezpieczne!!!, ale konieczne dla sygnalow o malym poziomie!!!
+                    //scale_flag = SCALE_FLAG;    // zawsze bezpieczne, ale dla sygnalow o malym poziomie amplitudy prazkow moga byc male i ginac w szumie szerokopasmowym
 
                     /* Bit-Reverse 1024-point data, Store into data_br, data_br aligned to 12-least significant binary zeros*/
                     hwafft_br(data, data_br, 1024); /* bit-reverse input data,
@@ -196,17 +195,14 @@ interrupt void dma_isr(void)
 
                     for (jj=0; jj<512; jj++)   {  // obliczenie kwadratu modulu sygnalu zespolonego widma
                         real = (Int16)(result[jj]>>16);  imag = (Int16)(result[jj] & 0x0000FFFF);
-                        pow_fl[jj] = (float)(real)*(float)(real) + (float)(imag)*(float)(imag);
+                        pow_fl[jj] = (real)*(real) + (imag)*(imag);
                     }
 
             // FFT READY
             status = clear();
-            status = setline(1);
-            status = setOrientation(1);
-            status = printstr("FFT READY");
-            scrollDisplayLeft();
+            writeFFT(pow_fl, 512);
             startFFT = 0;
         }
     }
-
+    CSL_SYSCTRL_REGS->DMAIFR |= ifrValue;
 }
