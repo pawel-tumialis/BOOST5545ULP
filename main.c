@@ -2,6 +2,7 @@
 #include "button.h"
 #include "oled.h"
 
+// Po modyfikacji kodu dla innej wersji hwafft należy zbudować raz jeszcze projekt!!!
 // ------------------STUDENT------------------------------
 #define SAMPLE_NUMBER 1024      //jeśli użyta ma być funkcja hwafft_128pts to tutaj trzeba wpisać 128 itd.
 
