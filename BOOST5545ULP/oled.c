@@ -2294,10 +2294,11 @@ void writeFFT(Int16* fft_buffor, Int16 size){
 
     send(0x00,0x2e);  // Deactivate Scrolling
 
+    if(OLED_LENGTH <= size){
     //draw down
     resetCursor(1);
     for (i=0;i<OLED_LENGTH;i++){
-        value = fft_buffor[i*(size/OLED_LENGTH)]/2048; // co 5 probka z tablicy na 16 pixelach
+        value = fft_buffor[i*(size/OLED_LENGTH)]/2048; // co ktoras probka z tablicy na 16 pixelach
         if(value > 8)
             value = 8;
         if(value!=0){
@@ -2315,7 +2316,7 @@ void writeFFT(Int16* fft_buffor, Int16 size){
     //draw bottom
     resetCursor(0);
     for (i=0;i<OLED_LENGTH;i++){
-        value = fft_buffor[i*(size/OLED_LENGTH)]/2048; // co 5 probka z tablicy na 16 pixelach
+        value = fft_buffor[i*(size/OLED_LENGTH)]/2048; // co ktoras probka z tablicy na 16 pixelach
         if(value < 8)
             value = 0;
         value = value%8;
@@ -2329,5 +2330,43 @@ void writeFFT(Int16* fft_buffor, Int16 size){
             send_value = 0;
         }
         send(0x40,send_value);
+    }
+    }else{
+        //draw down
+            resetCursor(1);
+            for (i=0;i<size;i++){
+                value = fft_buffor[i]/2048; // co ktoras probka z tablicy na 16 pixelach
+                if(value > 8)
+                    value = 8;
+                if(value!=0){
+                    send_value = 2;
+                    for(j=1;j<value;j++){
+                        send_value = send_value *2;
+                    }
+                    send_value = send_value -1;
+                }else{
+                    send_value = 0;
+                }
+                send(0x40,send_value);
+            }
+
+            //draw bottom
+            resetCursor(0);
+            for (i=0;i<size;i++){
+                value = fft_buffor[i]/2048; // co ktoras probka z tablicy na 16 pixelach
+                if(value < 8)
+                    value = 0;
+                value = value%8;
+                if(value!=0){
+                    send_value = 2;
+                    for(j=1;j<value;j++){
+                        send_value = send_value *2;
+                    }
+                    send_value = send_value -1;
+                }else{
+                    send_value = 0;
+                }
+                send(0x40,send_value);
+            }
     }
 }
