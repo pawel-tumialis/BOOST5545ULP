@@ -2291,6 +2291,7 @@ void writeFFT(Int16* fft_buffor, Int16 size){
     Int16 j=0;
     Int16 value=0;
     Int16 send_value=0;
+    Int16 printed_step = 15;    //jaki wzrost liczbowy powoduje dodanie pixela
 
     send(0x00,0x2e);  // Deactivate Scrolling
 
@@ -2298,7 +2299,7 @@ void writeFFT(Int16* fft_buffor, Int16 size){
     //draw down
     resetCursor(1);
     for (i=0;i<OLED_LENGTH;i++){
-        value = fft_buffor[i*(size/OLED_LENGTH)]/2048; // co ktoras probka z tablicy na 16 pixelach
+        value = fft_buffor[i*(size/OLED_LENGTH)]/printed_step; // co ktoras probka z tablicy na 16 pixelach
         if(value > 8)
             value = 8;
         if(value!=0){
@@ -2316,7 +2317,7 @@ void writeFFT(Int16* fft_buffor, Int16 size){
     //draw bottom
     resetCursor(0);
     for (i=0;i<OLED_LENGTH;i++){
-        value = fft_buffor[i*(size/OLED_LENGTH)]/2048; // co ktoras probka z tablicy na 16 pixelach
+        value = fft_buffor[i*(size/OLED_LENGTH)]/printed_step; // co ktoras probka z tablicy na 16 pixelach
         if(value < 8)
             value = 0;
         value = value%8;
@@ -2335,7 +2336,7 @@ void writeFFT(Int16* fft_buffor, Int16 size){
         //draw down
             resetCursor(1);
             for (i=0;i<size;i++){
-                value = fft_buffor[i]/2048; // co ktoras probka z tablicy na 16 pixelach
+                value = fft_buffor[i]/printed_step; // co ktoras probka z tablicy na 16 pixelach
                 if(value > 8)
                     value = 8;
                 if(value!=0){
@@ -2353,7 +2354,7 @@ void writeFFT(Int16* fft_buffor, Int16 size){
             //draw bottom
             resetCursor(0);
             for (i=0;i<size;i++){
-                value = fft_buffor[i]/2048; // co ktoras probka z tablicy na 16 pixelach
+                value = fft_buffor[i]/printed_step; // co ktoras probka z tablicy na 16 pixelach
                 if(value < 8)
                     value = 0;
                 value = value%8;
