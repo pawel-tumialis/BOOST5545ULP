@@ -1,10 +1,15 @@
 #include "codec_3206.h"
 #include "button.h"
 #include "oled.h"
+#include <math.h>
 
 // Po modyfikacji kodu dla innej wersji hwafft należy zbudować raz jeszcze projekt!!!
 // ------------------STUDENT------------------------------
 #define SAMPLE_NUMBER 1024      //jeśli użyta ma być funkcja hwafft_128pts to tutaj trzeba wpisać 128 itd.
+
+#define PI 3.141592
+#define PI2 2*PI
+#define PI4 2*PI2
 
 CSL_DMA_Handle      dmaHandleRxL;
 CSL_DMA_Handle      dmaHandleRxR;
@@ -18,6 +23,9 @@ CSL_Status          status;
 Int16 samples_left[SAMPLE_NUMBER];
 #pragma DATA_ALIGN(samples_left, 4);
 Uint16   startFFT = 0;
+Uint16   okno = 0;  // okno czasowe uzywane w algorytmie FFT, 0- brak okna, 1- okno Hamminga, 2- okno Blackmanna
+Uint16   napis = 0;
+Uint16   zmiana_okna = 0;
 
 /* FFT VARIABLES */
 typedef long        Int32_;
@@ -50,7 +58,6 @@ Int32_ *scratch = (Int32_ *)tab_scratch_buf;
 Uint16 out_sel;
 Int32_ *result;
 Int16 *result_16;
-Int32 pow[SAMPLE_NUMBER/2];
 Int16 pow_fl[SAMPLE_NUMBER/2];
 
 Int16 real, imag;
@@ -89,7 +96,7 @@ int main(void)
     status = printstr("HARDWARE FFT");
     status = setline(1);
     status = setOrientation(1);
-    status = printstr("MIDDLE BUTTON");
+    status = printstr("BRAK OKNA");
 
     Uint16   readButton;
     while(1){
@@ -98,6 +105,36 @@ int main(void)
             if(startFFT == 0){
                 startFFT = 1;
             }
+        }
+        GPIO_read(hGPIO,BUTTON0,&readButton);
+        if(readButton == 0){
+            if(zmiana_okna < 5){
+                okno = (okno + 1)%3;
+                napis = 1;
+                zmiana_okna = 0xFFFF;
+            }else{
+                zmiana_okna = (zmiana_okna - 1);
+            }
+        }
+        if(napis == 1){
+            status = clear();
+            status = setline(0);
+            status = setOrientation(1);
+            status = printstr("HARDWARE FFT");
+            status = setline(1);
+            status = setOrientation(1);
+            switch(okno){
+                case 0:
+                    status = printstr("BRAK OKNA");
+                    break;
+                case 1:
+                    status = printstr("HAMMING");
+                    break;
+                case 2:
+                    status = printstr("BLACKMANN");
+                    break;
+            }
+            napis = 0;
         }
     }
     return (0);
@@ -180,7 +217,18 @@ interrupt void dma_isr(void)
     if (ifrValue & (1<<4))
     {
         if(startFFT == 1){
-            // HARDWARE FFT
+            //--------HARDWARE FFT--------------
+            // Okna
+            if(okno == 1){  // Hamming
+                for (jj=0; jj<SAMPLE_NUMBER; jj++)   {
+                    samples_left[jj] = samples_left[jj] * (0.54 - 0.46*cos((PI2*jj)/(SAMPLE_NUMBER-1))
+                    );
+                }
+            }else if(okno == 2){    // Blackmann
+                for (jj=0; jj<SAMPLE_NUMBER; jj++)   {
+                    samples_left[jj] = samples_left[jj] * (0.42 - 0.5*cos((PI2*jj)/(SAMPLE_NUMBER-1)) + 0.08*cos((PI4*jj)/(SAMPLE_NUMBER-1)));
+                }
+            }
             for (jj=0; jj<SAMPLE_NUMBER; jj++)   {   //  kopiowanie danych wejsciowych
                         tab_fft[jj] = 0;  // wyzerowanie czesci realis i imaginalis
                         tab_fft[jj] = (Uint32)samples_left[jj] << 16; // wczytanie probki do czesci realis
@@ -206,11 +254,11 @@ interrupt void dma_isr(void)
 
                     for (jj=0; jj<SAMPLE_NUMBER/2; jj++)   {  // obliczenie kwadratu modulu sygnalu zespolonego widma
                         real = (Int16)(result[jj]>>16);  imag = (Int16)(result[jj] & 0x0000FFFF);
-                        pow_fl[jj] = (real)*(real) + (imag)*(imag);
+                        pow_fl[jj] = sqrt((real)*(real) + (imag)*(imag));   //modul widma sygnalu
                     }
 
             // FFT READY
-            status = clear();
+            status = clear();   // wyczysc oled
             writeFFT(pow_fl, SAMPLE_NUMBER/2);
             startFFT = 0;
         }
